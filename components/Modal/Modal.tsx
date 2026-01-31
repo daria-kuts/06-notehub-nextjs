@@ -1,6 +1,6 @@
 "use client";
 
-import { type ReactNode, useEffect } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import css from "./Modal.module.css";
 
@@ -9,10 +9,12 @@ interface Props {
   onClose: () => void;
 }
 
-const modalRoot = document.getElementById("modal-root") as HTMLElement;
-
 export default function Modal({ children, onClose }: Props) {
+  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
+
   useEffect(() => {
+    setModalRoot(document.getElementById("modal-root"));
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -26,8 +28,15 @@ export default function Modal({ children, onClose }: Props) {
     };
   }, [onClose]);
 
+  if (!modalRoot) return null;
+
   return createPortal(
-    <div className={css.backdrop} role="dialog" aria-modal="true" onClick={onClose}>
+    <div
+      className={css.backdrop}
+      role="dialog"
+      aria-modal="true"
+      onClick={onClose}
+    >
       <div className={css.modal} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
